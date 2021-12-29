@@ -1,0 +1,15 @@
+{
+	"compilerOptions": {
+		"lib": ["ES2021", "DOM"],
+		"module": "CommonJS",
+		"rootDir": "src",
+		"outDir": "dist",
+		"allowUnreachableCode": false,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitAny": true,
+		"noImplicitOverride": true,
+		"noImplicitReturns": true,
+		"strict": true
+	},
+	"include": ["src/**/*.*"]
+}
