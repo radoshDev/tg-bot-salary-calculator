@@ -1,3 +1,5 @@
+import { GoogleSpreadsheetRow } from "google-spreadsheet"
+
 export type SheetHeaders = {
 	date: string
 	revenue: string
@@ -5,6 +7,9 @@ export type SheetHeaders = {
 	comment: string
 }
 
-export interface RegExpExecArray extends Array<string> {
-	groups?: SheetHeaders
+export interface SheetRow extends GoogleSpreadsheetRow {
+	date?: SheetHeaders["date"]
+	revenue?: SheetHeaders["revenue"]
+	day_income?: SheetHeaders["day_income"]
+	comments?: SheetHeaders["comment"]
 }
