@@ -5,7 +5,10 @@ import { SheetHeaders, SheetRow } from "./types/spreadSheetTypes"
 require("dotenv").config()
 
 const FIXED_SALARY = 400
-const bot = new Telegraf(process.env.TG_BOT_TOKEN as string)
+const token = process.env.TG_BOT_TOKEN
+if (!token) throw Error("BOT_TOKEN must be provided!")
+
+const bot = new Telegraf(token)
 start()
 async function start() {
 	try {
