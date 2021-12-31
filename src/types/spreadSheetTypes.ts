@@ -11,5 +11,5 @@ export interface SheetRow extends GoogleSpreadsheetRow {
 	date?: SheetHeaders["date"]
 	revenue?: SheetHeaders["revenue"]
 	day_income?: SheetHeaders["day_income"]
-	comments?: SheetHeaders["comment"]
+	comment?: SheetHeaders["comment"]
 }

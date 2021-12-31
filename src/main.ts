@@ -5,11 +5,13 @@ import { SheetHeaders, SheetRow } from "./types/spreadSheetTypes"
 require("dotenv").config()
 
 const FIXED_SALARY = 400
+const revenueReg = /^([а-я0-9.]+ )?\d{5,}(\s+[а-я0-9-.,]+)?/i //вчора 15000 Покровська
 const token = process.env.TG_BOT_TOKEN
 if (!token) throw Error("BOT_TOKEN must be provided!")
 
 const bot = new Telegraf(token)
 start()
+
 async function start() {
 	try {
 		const doc = await initSpreadSheet()
@@ -18,36 +20,27 @@ async function start() {
 		bot.start(ctx =>
 			ctx.reply(
 				"Вітаю в Калькуляторі зарплати",
-				Markup.keyboard([Markup.button.callback("Зарплата", "salary")]).resize()
+				Markup.keyboard(["Зарплата", "Звіт"], {
+					columns: 2,
+				}).resize()
 			)
 		)
-		bot.action("salary", async ctx => {
-			ctx.reply("Хоч зп?")
-		})
-		bot.hears("зп", async ctx => {
+		bot.hears("Зарплата", async ctx => {
 			const rows = await sheet.getRows()
 			const salary = calculateMonthSalary(rows)
 
 			ctx.replyWithMarkdown(`В грудні ти заробила *${salary} грн*`)
 		})
-		bot.hears("звіт", async ctx => {
+		bot.hears("Звіт", async ctx => {
 			const rows: SheetRow[] = await sheet.getRows()
-			ctx.replyWithMarkdown(
-				`_${rows[0].date}_ - *${rows[0].day_income} грн*\n_${rows[1].date}_ - *${
-					rows[1].day_income
-				} грн*\n\n*Разом: ${calculateMonthSalary(rows)} грн*`
-			)
+			ctx.replyWithHTML(generateReportText(rows))
 		})
-		bot.on("text", async ctx => {
+		bot.hears(revenueReg, async ctx => {
 			const userInput = ctx.message.text
 			const { date: inputDate, comment, revenue } = parseUserText(userInput)
-			if (!revenue) {
-				ctx.replyWithMarkdown("Ти не вірно ввела виручку\n\nПриклад: *13000* або `дата` *13000*")
-				return
-			}
-
 			const date = parseDate(inputDate)
 			const rows: SheetRow[] = await sheet.getRows()
+
 			if (isValueExist(rows, { col: "date", value: date })) {
 				const currentRow = rows.find(row => row.date === date)!
 				currentRow.revenue = revenue
@@ -66,11 +59,19 @@ async function start() {
 			ctx.replyWithMarkdown(compliment(calculateDayIncome(revenue)))
 		})
 		bot.help(ctx => ctx.reply("Send me a sticker"))
-		bot.on("sticker", ctx => ctx.reply("👍"))
+		bot.command("db", async ctx =>
+			ctx.replyWithHTML(
+				"<a href='https://docs.google.com/spreadsheets/d/1MkRAS_yyHMFRvZiKKbmyAAe1Nzc6wFopAJ9WciCvMpQ/edit#gid=0'>База даних</a>"
+			)
+		)
+		bot.on("message", ctx =>
+			ctx.replyWithHTML(
+				"<u>Не вірно введена виручка</u>\n<i>Приклад:</i>\n<b>23000</b>\n---або---\n<b>вчора 25700</b>\n---або---\n<b>21.01 35800</b>"
+			)
+		)
 		bot.launch()
 	} catch (error) {}
 }
-
 async function initSpreadSheet() {
 	const doc = new GoogleSpreadsheet(process.env.SPREADSHEET_ID as string)
 	await doc.useServiceAccountAuth({
@@ -103,10 +104,18 @@ function parseDate(date: string): string {
 	return `${day}.${month}.${year}`
 }
 function calculateDayIncome(revenue: number | string): number {
-	return +(Number(revenue) / 100 + FIXED_SALARY).toFixed(2)
+	return Math.floor(Number(revenue) / 100 + FIXED_SALARY)
 }
 function calculateMonthSalary(rows: SheetRow[]): number {
 	return rows.reduce((sum, row) => sum + Number(row.day_income), 0)
+}
+function generateReportText(rows: SheetRow[]): string {
+	if (rows.length === 0) return "Ще поки нічого не додано в цьому місяці"
+	const listOfDays = rows.map(
+		row => `<i>${row.date}</i> - <b>${row.day_income} грн</b>${row.comment ? " <u>(" + row.comment + ")</u>" : ""}`
+	)
+	const summary = `\n\n<b>Разом: ${calculateMonthSalary(rows)} грн</b>`
+	return listOfDays.join("\n") + summary
 }
 function compliment(income: number) {
 	if (income > 600) {
