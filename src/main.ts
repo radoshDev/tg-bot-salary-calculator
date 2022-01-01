@@ -1,50 +1,63 @@
-import { Telegraf, Context, Markup } from "telegraf"
-import { GoogleSpreadsheet, GoogleSpreadsheetRow } from "google-spreadsheet"
-import { SheetHeaders, SheetRow } from "./types/spreadSheetTypes"
+import { Telegraf, Scenes, Markup, session } from "telegraf"
+import { GoogleSpreadsheet, GoogleSpreadsheetRow, GoogleSpreadsheetWorksheet } from "google-spreadsheet"
+import { MyContext, SheetHeaders, SheetRow } from "./types/spreadSheetTypes"
+import { stage } from "./scenes"
+import { reportSalaryBtn } from "./buttons/reportSalaryBtn"
+import { compliment } from "./utils/compliment"
+import { isValueExist } from "./utils/isValueExist"
+import { generateReportText } from "./utils/generateReportText"
+import { parseUserText } from "./utils/parseUserText"
 //reading ENV file
 require("dotenv").config()
+enum Headers {
+	date = "date",
+	revenue = "revenue",
+	dayIncome = "day_income",
+	comment = "comment",
+}
 
-const FIXED_SALARY = 400
 const revenueReg = /^([а-я0-9.]+ )?\d{5,}(\s+[а-я0-9-.,]+)?/i //вчора 15000 Покровська
 const token = process.env.TG_BOT_TOKEN
 if (!token) throw Error("BOT_TOKEN must be provided!")
 
-const bot = new Telegraf(token)
+const bot = new Telegraf<MyContext>(token)
 start()
-
 async function start() {
 	try {
 		const doc = await initSpreadSheet()
-		const sheet = doc.sheetsByTitle["december"]
+		let sheet: GoogleSpreadsheetWorksheet | undefined
+		bot.use(session())
+		bot.use(stage.middleware())
+		bot.start(async ctx => {
+			sheet = doc.sheetsByTitle[ctx.message.from.username || "default"]
+			sheet ??= await generateSheet(doc, ctx.message.from.username)
 
-		bot.start(ctx =>
-			ctx.reply(
-				"Вітаю в Калькуляторі зарплати",
-				Markup.keyboard(["Зарплата", "Звіт"], {
-					columns: 2,
-				}).resize()
-			)
-		)
+			return ctx.reply("Вітаю в Калькуляторі зарплати", reportSalaryBtn())
+		})
 		bot.hears("Зарплата", async ctx => {
-			const rows = await sheet.getRows()
-			const salary = calculateMonthSalary(rows)
+			if (!sheet) return console.log("Error from Зарплата")
+			ctx.session.rows = await sheet.getRows()
 
-			ctx.replyWithMarkdown(`В грудні ти заробила *${salary} грн*`)
+			return await ctx.scene.enter("salary")
 		})
 		bot.hears("Звіт", async ctx => {
+			if (!sheet) return console.log("something wrong")
 			const rows: SheetRow[] = await sheet.getRows()
-			ctx.replyWithHTML(generateReportText(rows))
+			return ctx.replyWithHTML(generateReportText(rows))
 		})
 		bot.hears(revenueReg, async ctx => {
 			const userInput = ctx.message.text
-			const { date: inputDate, comment, revenue } = parseUserText(userInput)
-			const date = parseDate(inputDate)
+			const { date, comment, revenue, day_income } = parseUserText(userInput)
+
+			if (!sheet) return console.log("Problem with sheet")
+
 			const rows: SheetRow[] = await sheet.getRows()
 
 			if (isValueExist(rows, { col: "date", value: date })) {
 				const currentRow = rows.find(row => row.date === date)!
 				currentRow.revenue = revenue
-				currentRow.day_income = `${calculateDayIncome(revenue)}`
+				currentRow.day_income = day_income
+				currentRow.comment = comment
 				await currentRow.save()
 				ctx.replyWithMarkdown(`Відредаговано за _${date}_`)
 				return
@@ -53,10 +66,10 @@ async function start() {
 			await sheet.addRow({
 				date,
 				revenue,
-				day_income: `${calculateDayIncome(revenue)}`,
+				day_income,
 				comment,
 			} as SheetHeaders)
-			ctx.replyWithMarkdown(compliment(calculateDayIncome(revenue)))
+			return ctx.replyWithMarkdown(compliment(Number(day_income)))
 		})
 		bot.help(ctx => ctx.reply("Send me a sticker"))
 		bot.command("db", async ctx =>
@@ -81,57 +94,11 @@ async function initSpreadSheet() {
 	await doc.loadInfo()
 	return doc
 }
-function parseUserText(inputText: string): Omit<SheetHeaders, "day_income"> {
-	const regExp = /((?<date>([a-я]|(\d{1,2}(\.\d{1,2})?))+)\s+)?(?<revenue>\d{4,})(\s+(?<comment>\w+))?/i
-	const groupeResult = inputText.match(regExp)
-	return {
-		date: groupeResult?.groups?.["date"] || "",
-		revenue: groupeResult?.groups?.["revenue"] || "",
-		comment: groupeResult?.groups?.["comment"] || "",
-	}
+async function generateSheet(doc: GoogleSpreadsheet, userId = "unknown") {
+	const newSheet = await doc.addSheet({ headerValues: Object.values(Headers), title: userId })
+	return newSheet
 }
-function parseDate(date: string): string {
-	const currentDate = new Date()
-	if (date === "вчора") currentDate.setDate(currentDate.getDate() - 1)
-	if (date === "позавчора") currentDate.setDate(currentDate.getDate() - 2)
 
-	const [currentDay, currentMonth, currentYear] = currentDate.toLocaleDateString().split(".")
-	const [userDay, userMonth, userYear] = date.split(".")
-	const day = startWithZero(/\d/.test(userDay) ? userDay : currentDay)
-	const month = startWithZero(userMonth || currentMonth)
-	const year = startWithZero(userYear || currentYear)
-
-	return `${day}.${month}.${year}`
-}
-function calculateDayIncome(revenue: number | string): number {
-	return Math.floor(Number(revenue) / 100 + FIXED_SALARY)
-}
-function calculateMonthSalary(rows: SheetRow[]): number {
-	return rows.reduce((sum, row) => sum + Number(row.day_income), 0)
-}
-function generateReportText(rows: SheetRow[]): string {
-	if (rows.length === 0) return "Ще поки нічого не додано в цьому місяці"
-	const listOfDays = rows.map(
-		row => `<i>${row.date}</i> - <b>${row.day_income} грн</b>${row.comment ? " <u>(" + row.comment + ")</u>" : ""}`
-	)
-	const summary = `\n\n<b>Разом: ${calculateMonthSalary(rows)} грн</b>`
-	return listOfDays.join("\n") + summary
-}
-function compliment(income: number) {
-	if (income > 600) {
-		return `Твій заробіток *${income} грн.*\n\n Ти молодець! Гарно попрацювала😘`
-	}
-	return `Твій заробіток *${income} грн.*\n\n Це теж не погано, молодчинка. Приїдеш додому я тобі зроблю чаю з ромашкою`
-}
-function isValueExist(rows: SheetRow[], { col, value }: { col: keyof SheetHeaders; value: string }): boolean {
-	return !!rows.find(row => row[col] === value)
-}
-function startWithZero(value: number | string): string | number {
-	if (typeof value === "string") value = Number(value)
-	if (isNaN(value)) throw Error("Not a number")
-
-	return value > 9 ? value : `0${value}`
-}
 // Enable graceful stop
 process.once("SIGINT", () => bot.stop("SIGINT"))
 process.once("SIGTERM", () => bot.stop("SIGTERM"))

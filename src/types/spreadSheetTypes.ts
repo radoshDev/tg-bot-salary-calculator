@@ -1,4 +1,5 @@
 import { GoogleSpreadsheetRow } from "google-spreadsheet"
+import { Context, Scenes } from "telegraf"
 
 export type SheetHeaders = {
 	date: string
@@ -12,4 +13,14 @@ export interface SheetRow extends GoogleSpreadsheetRow {
 	revenue?: SheetHeaders["revenue"]
 	day_income?: SheetHeaders["day_income"]
 	comment?: SheetHeaders["comment"]
+}
+
+interface MySession extends Scenes.SceneSession {
+	// will be available under `ctx.session.mySessionProp`
+	rows: SheetRow[]
+}
+
+export interface MyContext extends Context {
+	session: MySession
+	scene: Scenes.SceneContextScene<MyContext>
 }
