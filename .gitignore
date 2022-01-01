@@ -13,3 +13,7 @@
 .DS_Store
 .env.local
 .env
+
+# IDE
+/.vscode
+/.idea
