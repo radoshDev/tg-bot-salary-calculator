@@ -1,6 +1,6 @@
-export function startWithZero(value: number | string): string | number {
+export function startWithZero(value: number | string): string {
 	if (typeof value === "string") value = Number(value)
-	if (isNaN(value)) throw Error("Not a number")
+	if (isNaN(value) || value < 1) throw new Error("Not valid number")
 
-	return value > 9 ? value : `0${value}`
+	return value > 9 ? `${value}` : `0${value}`
 }

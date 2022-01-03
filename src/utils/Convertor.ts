@@ -1,20 +1,5 @@
-type Code = "01" | "02" | "03" | "04" | "05" | "06" | "07" | "08" | "09" | "10" | "11" | "12"
-type Month =
-	| "Січень"
-	| "Лютий"
-	| "Березень"
-	| "Квітень"
-	| "Травень"
-	| "Червень"
-	| "Липень"
-	| "Серпень"
-	| "Вересень"
-	| "Жовтень"
-	| "Листопад"
-	| "Грудень"
-
 export class Convertor {
-	readonly base: { [key in Code]: Month } = {
+	static readonly base: { [key: string]: string } = {
 		"01": "Січень",
 		"02": "Лютий",
 		"03": "Березень",
@@ -28,11 +13,11 @@ export class Convertor {
 		"11": "Листопад",
 		"12": "Грудень",
 	}
-	codeToMonth(code: Code) {
-		return this.base[code]
+	static codeToMonth(code: string) {
+		return this.base[code] || "Помилка дати"
 	}
-	monthToCode(month: Month) {
-		const keys = Object.keys(this.base) as Code[]
-		return keys.find(key => this.base[key] === month)
+	static monthToCode(month: string) {
+		const monthsCodes = Object.keys(this.base)
+		return monthsCodes.find(code => this.base[code] === month)
 	}
 }

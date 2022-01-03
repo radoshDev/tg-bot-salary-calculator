@@ -1,17 +1,25 @@
-import { Scenes, Markup } from "telegraf"
-import { reportSalaryBtn } from "../buttons/reportSalaryBtn"
+import { Scenes } from "telegraf"
+import { monthsButtons } from "../buttons/monthsButtons"
+import { mainMenuButtons } from "../buttons/mainMenuButtons"
+import { EXIT_BTN_TEXT, MONTH_REG_EXP, SALARY_SCENE_ID } from "../constants"
 import { MyContext } from "../types/spreadSheetTypes"
+import { calculateMonthSalary } from "../utils/calculateMonthSalary"
+import { Convertor } from "../utils/Convertor"
 
 const { enter, leave } = Scenes.Stage
 
-export const salaryScene = new Scenes.BaseScene<MyContext>("salary")
+export const salaryScene = new Scenes.BaseScene<MyContext>(SALARY_SCENE_ID)
 salaryScene.enter(async ctx => {
-	return ctx.reply(
-		"Вибери місяць:",
-		Markup.keyboard(["Вихід", "Грудень 2021", "Січень 2022", "Лютий 2022"], { columns: 3 }).resize()
-	)
+	const rows = ctx.session.rows
+	return ctx.reply("Вибери місяць:", monthsButtons(rows))
 })
-salaryScene.leave(ctx => ctx.reply("Головне меню", reportSalaryBtn()))
-salaryScene.hears("Грудень 2021", ctx => ctx.reply("В грудні ти заробила 2000грн, " + ctx.session.rows[0].revenue))
-salaryScene.hears("Вихід", leave<MyContext>())
+salaryScene.leave(ctx => ctx.reply("Головне меню", mainMenuButtons()))
+salaryScene.hears(MONTH_REG_EXP, ctx => {
+	const [_, month, year] = ctx.match
+	const numerableDateMonthYear = `${Convertor.monthToCode(month)}.${year}`
+	const rowsOfMonth = ctx.session.rows.filter(row => row.date?.includes(numerableDateMonthYear))
+	const monthSalary = calculateMonthSalary(rowsOfMonth)
+	return ctx.replyWithHTML(`Зарплата за <u><i>${month.toLowerCase()} ${year}-го</i></u>: <b>${monthSalary} грн</b>.`)
+})
+salaryScene.hears(EXIT_BTN_TEXT, leave<MyContext>())
 salaryScene.on("message", ctx => ctx.replyWithMarkdown("Треба вибрати з кнопок"))
