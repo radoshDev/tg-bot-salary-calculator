@@ -1,9 +1,11 @@
 import { Markup, Scenes } from "telegraf"
 import { mainMenuButtons } from "../buttons/mainMenuButtons"
-import { ADVANCE_SCENE_ID, EXIT_BTN_TEXT, REVENUE_REG_EXP } from "../constants"
+import { ADVANCE_CANCEL_ID, ADVANCE_SCENE_ID, ADVANCE_TEXT, EXIT_BTN_TEXT, REVENUE_REG_EXP } from "../constants"
 import { MyContext, SheetHeaders } from "../types/spreadSheetTypes"
 import { rowWithValueInSheet } from "../utils/rowWithValueInSheet"
 import { parseDate } from "../utils/parseDate"
+import { advanceConfirmBtn } from "../buttons/advanceConfirmBtn"
+import { ADVANCE_ADD_ID } from "./../constants"
 
 const { enter, leave } = Scenes.Stage
 
@@ -21,16 +23,41 @@ advanceScene.hears(REVENUE_REG_EXP, async ctx => {
 	const rows = await sheet.getRows()
 	const rowInSheet = rowWithValueInSheet(rows, { col: "comment", value: "аванс" })
 	if (rowInSheet) {
+		ctx.session.advance = {
+			date,
+			revenue: "",
+			day_income: advance,
+			comment: `${ADVANCE_TEXT}${comment ? " | " + comment : ""}`,
+		}
+		return ctx.replyWithHTML(
+			`В даному місяці вже додано аванс <i>${rowInSheet.date}</i> - <b>${rowInSheet.day_income} грн</b>. Додати ще один?`,
+			advanceConfirmBtn()
+		)
 	}
 
 	await sheet.addRow({
 		date,
 		revenue: "",
 		day_income: advance,
-		comment: `аванс${comment ? " | " + comment : ""}`,
+		comment: `${ADVANCE_TEXT}${comment ? " | " + comment : ""}`,
 	} as SheetHeaders)
 
-	return ctx.replyWithHTML(`Аванс на <i>${date}</i> в сумі ${advance} грн додано.`)
+	await ctx.replyWithHTML(`Аванс на <i>${date}</i> в сумі ${advance} грн додано.`)
+	return ctx.scene.leave()
 })
 advanceScene.hears(EXIT_BTN_TEXT, leave<MyContext>())
+advanceScene.action(ADVANCE_ADD_ID, async ctx => {
+	const sheet = ctx.session.sheet
+	const { date, revenue, day_income: advance, comment } = ctx.session.advance
+	await sheet.addRow({
+		date,
+		revenue,
+		day_income: advance,
+		comment,
+	} as SheetHeaders)
+	await ctx.answerCbQuery()
+	await ctx.replyWithHTML(`Аванс на <i>${date}</i> в сумі ${advance} грн додано.`)
+	return ctx.scene.leave()
+})
+advanceScene.action(ADVANCE_CANCEL_ID, leave<MyContext>())
 advanceScene.on("message", ctx => ctx.replyWithMarkdown("Потрібно ввести суму цифрам від 100 до 99999 грн"))

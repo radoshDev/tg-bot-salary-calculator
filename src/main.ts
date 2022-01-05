@@ -16,8 +16,11 @@ import {
 	ADVANCE_BTN_TEXT,
 	ADVANCE_SCENE_ID,
 	LOAD_BTN_TEXT,
+	ERROR_MSG_SHEET,
+	ADVANCE_TEXT,
 } from "./constants"
 import { loaderButton } from "./buttons/loaderButton"
+import { calculateDayIncome } from "./utils/calculateDayIncome"
 //reading ENV file
 require("dotenv").config()
 
@@ -27,65 +30,66 @@ if (!token) throw Error("BOT_TOKEN must be provided!")
 const bot = new Telegraf<MyContext>(token)
 start()
 async function start() {
-	try {
-		const doc = await initSpreadSheet()
-		bot.use(session())
-		bot.use(stage.middleware())
-		bot.start(async ctx => {
-			const title = getSheetTitle(ctx)
-			const sheet = doc.sheetsByTitle[title]
-			if (!sheet) {
-				await generateSheet(doc, title)
-			}
-			return ctx.reply("Вітаю в Калькуляторі зарплати", mainMenuButtons())
-		})
-		bot.hears(SALARY_BTN_TEXT, async ctx => {
-			ctx.reply(LOAD_BTN_TEXT, loaderButton())
-			const user = ctx.message.from.username || ctx.message.from.first_name + ctx.message.from.id
-			const sheet = doc.sheetsByTitle[user || "default"]
+	const doc = await initSpreadSheet()
+	bot.use(session())
+	bot.use(stage.middleware())
+	bot.start(async ctx => {
+		const title = getSheetTitle(ctx)
+		const sheet = doc.sheetsByTitle[title]
+		if (!sheet) {
+			await generateSheet(doc, title)
+		}
+		return ctx.reply("Вітаю в Калькуляторі зарплати", mainMenuButtons())
+	})
+	bot.hears(SALARY_BTN_TEXT, async ctx => {
+		ctx.reply(LOAD_BTN_TEXT, loaderButton())
+		const user = ctx.message.from.username || ctx.message.from.first_name + ctx.message.from.id
+		const sheet = doc.sheetsByTitle[user || "default"]
 
-			if (!sheet) return console.log("Error from Зарплата")
+		if (!sheet) return console.log("Error from Зарплата")
 
-			ctx.session.rows = await sheet.getRows()
-			return await ctx.scene.enter(SALARY_SCENE_ID)
-		})
-		bot.hears(REPORT_BTN_TEXT, async ctx => {
-			ctx.reply(LOAD_BTN_TEXT, loaderButton())
-			const title = getSheetTitle(ctx)
-			const sheet = doc.sheetsByTitle[title]
+		ctx.session.rows = await sheet.getRows()
+		return await ctx.scene.enter(SALARY_SCENE_ID)
+	})
+	bot.hears(REPORT_BTN_TEXT, async ctx => {
+		ctx.reply(LOAD_BTN_TEXT, loaderButton())
+		const title = getSheetTitle(ctx)
+		const sheet = doc.sheetsByTitle[title]
 
-			if (!sheet) throw Error("Sheet not found")
+		if (!sheet) throw Error(ERROR_MSG_SHEET)
 
-			ctx.session.rows = await sheet.getRows()
-			return await ctx.scene.enter(REPORT_SCENE_ID)
-		})
-		bot.hears(ADVANCE_BTN_TEXT, async ctx => {
-			const title = getSheetTitle(ctx)
-			const sheet = doc.sheetsByTitle[title]
+		ctx.session.rows = await sheet.getRows()
+		return await ctx.scene.enter(REPORT_SCENE_ID)
+	})
+	bot.hears(ADVANCE_BTN_TEXT, async ctx => {
+		const title = getSheetTitle(ctx)
+		const sheet = doc.sheetsByTitle[title]
 
-			if (!sheet) throw Error("Sheet not found")
+		if (!sheet) throw Error(ERROR_MSG_SHEET)
 
-			ctx.session.sheet = sheet
-			return await ctx.scene.enter(ADVANCE_SCENE_ID)
-		})
-		bot.hears(REVENUE_REG_EXP, async ctx => {
+		ctx.session.sheet = sheet
+		return await ctx.scene.enter(ADVANCE_SCENE_ID)
+	})
+	bot.hears(REVENUE_REG_EXP, async ctx => {
+		try {
 			const userInput = ctx.message.text
 			const { date, comment, revenue, day_income } = parseUserText(userInput)
 			const title = getSheetTitle(ctx)
 			const sheet = doc.sheetsByTitle[title]
 
-			if (!sheet) throw Error("Sheet not found")
+			if (!sheet) throw Error(ERROR_MSG_SHEET)
 
 			const rows: SheetRow[] = await sheet.getRows()
 			const rowInDB = rowWithValueInSheet(rows, { col: "date", value: date })
 
-			if (rowInDB) {
+			if (rowInDB && !rowInDB.comment?.includes(ADVANCE_TEXT)) {
 				rowInDB.revenue = revenue
 				rowInDB.day_income = day_income
 				rowInDB.comment = comment
 				await rowInDB.save()
-				ctx.replyWithMarkdown(`Відредаговано за _${date}_`)
-				return
+				return ctx.replyWithHTML(
+					`Відредаговано за <i>${date}</i>.\n\n Заробіток у цей день: <b>${calculateDayIncome(revenue)} грн</b>`
+				)
 			}
 
 			await sheet.addRow({
@@ -96,21 +100,24 @@ async function start() {
 			} as SheetHeaders)
 
 			return ctx.replyWithMarkdown(compliment(Number(day_income)))
-		})
-		bot.help(ctx => ctx.reply("Send me a sticker"))
-		bot.command("db", async ctx =>
-			ctx.replyWithHTML(
-				"<a href='https://docs.google.com/spreadsheets/d/1MkRAS_yyHMFRvZiKKbmyAAe1Nzc6wFopAJ9WciCvMpQ/edit#gid=0'>База даних</a>"
-			)
+		} catch (e) {
+			const error = e as Error
+			return ctx.replyWithHTML(error.message)
+		}
+	})
+	bot.help(ctx => ctx.reply("Send me a sticker"))
+	bot.command("db", async ctx =>
+		ctx.replyWithHTML(
+			"<a href='https://docs.google.com/spreadsheets/d/1MkRAS_yyHMFRvZiKKbmyAAe1Nzc6wFopAJ9WciCvMpQ/edit#gid=0'>База даних</a>"
 		)
-		bot.on("message", ctx => {
-			console.log(ctx.from)
-			return ctx.replyWithHTML(
-				"<u>Не вірно введена виручка</u>\n<i>Приклад:</i>\n<b>23000</b>\n---або---\n<b>вчора 25700</b>\n---або---\n<b>21.01 35800</b>"
-			)
-		})
-		bot.launch()
-	} catch (error) {}
+	)
+	bot.on("message", ctx => {
+		console.log(ctx.from)
+		return ctx.replyWithHTML(
+			"<u>Не вірно введена виручка</u>\n<i>Приклад:</i>\n<b>23000</b>\n---або---\n<b>вчора 25700</b>\n---або---\n<b>21.01 35800</b>"
+		)
+	})
+	bot.launch()
 }
 async function initSpreadSheet() {
 	const doc = new GoogleSpreadsheet(process.env.SPREADSHEET_ID as string)

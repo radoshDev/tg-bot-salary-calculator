@@ -19,6 +19,7 @@ interface MySession extends Scenes.SceneSession {
 	// will be available under `ctx.session.mySessionProp`
 	rows: SheetRow[]
 	sheet: GoogleSpreadsheetWorksheet
+	advance: SheetHeaders
 }
 
 export interface MyContext extends Context {

@@ -1,3 +1,4 @@
+import { ERROR_MSG_FUTURE_DATE } from "../constants"
 import { startWithZero } from "./startWithZero"
 
 export function parseDate(date: string | undefined): string {
@@ -13,5 +14,10 @@ export function parseDate(date: string | undefined): string {
 	const day = startWithZero(/\d/.test(userDay) ? userDay : currentDay)
 	const month = startWithZero(userMonth || currentMonth)
 	const year = startWithZero(userYear || currentYear)
-	return `${day}.${month}.${year}`
+	const result = `${day}.${month}.${year}`
+	const resultUS = `${month}.${day}.${year}`
+	if (Date.parse(resultUS) > currentDate.getDate()) {
+		throw new Error(ERROR_MSG_FUTURE_DATE)
+	}
+	return result
 }
