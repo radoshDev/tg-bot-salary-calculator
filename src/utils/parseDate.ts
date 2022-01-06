@@ -15,8 +15,7 @@ export function parseDate(date: string | undefined): string {
 	const month = startWithZero(userMonth || currentMonth)
 	const year = startWithZero(userYear || currentYear)
 	const result = `${day}.${month}.${year}`
-	const resultUS = `${month}.${day}.${year}`
-	if (Date.parse(resultUS) > currentDate.getDate()) {
+	if (Date.parse(result) > currentDate.getDate()) {
 		throw new Error(ERROR_MSG_FUTURE_DATE)
 	}
 	return result
