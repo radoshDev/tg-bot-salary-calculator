@@ -30,6 +30,7 @@ if (!token) throw Error("BOT_TOKEN must be provided!")
 const bot = new Telegraf<MyContext>(token)
 start()
 async function start() {
+	try {
 	const doc = await initSpreadSheet()
 	bot.use(session())
 	bot.use(stage.middleware())
@@ -118,6 +119,10 @@ async function start() {
 		)
 	})
 	bot.launch()
+	}
+catch(error) {
+	console.log(error)
+}
 }
 async function initSpreadSheet() {
 	const doc = new GoogleSpreadsheet(process.env.SPREADSHEET_ID as string)
