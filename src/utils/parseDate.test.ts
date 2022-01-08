@@ -1,22 +1,23 @@
+import { LOCALES } from "../constants"
 import { parseDate } from "./parseDate"
 
 describe("Testing parseDate.ts", () => {
 	const timeStamp = new Date().getTime()
 	const dayStamp = 24 * 60 * 60 * 1000
-	const currentLocalDate = new Date().toLocaleDateString()
-	const [currentDay, currentMonth, currentYear] = new Date().toLocaleDateString().split(".")
+	const currentLocalDate = new Date().toLocaleDateString(LOCALES)
+	const [currentDay, currentMonth, currentYear] = currentLocalDate.split(".")
 
 	it("pass empty string", () => {
 		expect(parseDate("")).toBe(currentLocalDate)
 	})
 	it("pass word 'вчора'", () => {
 		const yesterdayTimeStamp = timeStamp - dayStamp
-		const yesterdayLocalDate = new Date(yesterdayTimeStamp).toLocaleDateString()
+		const yesterdayLocalDate = new Date(yesterdayTimeStamp).toLocaleDateString(LOCALES)
 		expect(parseDate("вчора")).toBe(yesterdayLocalDate)
 	})
 	it("pass word 'позавчора'", () => {
 		const beforeYesterdayTimeStamp = timeStamp - dayStamp - dayStamp
-		const beforeYesterdayLocalDate = new Date(beforeYesterdayTimeStamp).toLocaleDateString()
+		const beforeYesterdayLocalDate = new Date(beforeYesterdayTimeStamp).toLocaleDateString(LOCALES)
 		expect(parseDate("позавчора")).toBe(beforeYesterdayLocalDate)
 	})
 	it("get only day without zero start", () => {

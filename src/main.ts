@@ -4,7 +4,7 @@ import { MyContext, SheetHeaders, SheetRow } from "./types/spreadSheetTypes"
 import { stage } from "./scenes"
 import { mainMenuButtons } from "./buttons/mainMenuButtons"
 import { compliment } from "./utils/compliment"
-import { rowWithValueInSheet } from "./utils/rowWithValueInSheet"
+import { rowWithDateInSheet } from "./utils/rowWithDateInSheet"
 import { parseUserText } from "./utils/parseUserText"
 import {
 	REVENUE_REG_EXP,
@@ -81,7 +81,7 @@ async function start() {
 			if (!sheet) throw Error(ERROR_MSG_SHEET)
 
 			const rows: SheetRow[] = await sheet.getRows()
-			const rowInDB = rowWithValueInSheet(rows, { col: "date", value: date })
+			const rowInDB = rowWithDateInSheet(rows, date )
 
 			if (rowInDB && !rowInDB.comment?.includes(ADVANCE_TEXT)) {
 				rowInDB.revenue = revenue

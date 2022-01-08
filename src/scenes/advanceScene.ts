@@ -1,11 +1,11 @@
 import { Markup, Scenes } from "telegraf"
 import { mainMenuButtons } from "../buttons/mainMenuButtons"
 import { ADVANCE_CANCEL_ID, ADVANCE_SCENE_ID, ADVANCE_TEXT, EXIT_BTN_TEXT, REVENUE_REG_EXP } from "../constants"
-import { MyContext, SheetHeaders } from "../types/spreadSheetTypes"
-import { rowWithValueInSheet } from "../utils/rowWithValueInSheet"
+import { MyContext, SheetHeaders, SheetRow } from "../types/spreadSheetTypes"
 import { parseDate } from "../utils/parseDate"
 import { advanceConfirmBtn } from "../buttons/advanceConfirmBtn"
 import { ADVANCE_ADD_ID } from "./../constants"
+import { generateDateAdvanceText } from "../utils/generateDateAdvanceText"
 
 const { enter, leave } = Scenes.Stage
 
@@ -19,10 +19,13 @@ advanceScene.hears(REVENUE_REG_EXP, async ctx => {
 
 	const { date: userDate, revenue: advance, comment } = ctx.match.groups
 	const date = parseDate(userDate)
+	const monthYear = date.slice(3)
 	const sheet = ctx.session.sheet
 	const rows = await sheet.getRows()
-	const rowInSheet = rowWithValueInSheet(rows, { col: "comment", value: "аванс" })
-	if (rowInSheet) {
+	const isDBIncludeComment = (row: SheetRow):boolean => 
+		!!row.date?.includes(monthYear) && !!row.comment?.includes(ADVANCE_TEXT)
+	const currentMonthAdvance = rows.filter(isDBIncludeComment)
+	if (currentMonthAdvance.length > 0) {
 		ctx.session.advance = {
 			date,
 			revenue: "",
@@ -30,7 +33,7 @@ advanceScene.hears(REVENUE_REG_EXP, async ctx => {
 			comment: `${ADVANCE_TEXT}${comment ? " | " + comment : ""}`,
 		}
 		return ctx.replyWithHTML(
-			`В даному місяці вже додано аванс <i>${rowInSheet.date}</i> - <b>${rowInSheet.day_income} грн</b>. Додати ще один?`,
+			`В даному місяці вже додано аванс\n${generateDateAdvanceText(currentMonthAdvance)}.\n Додати ще один?`,
 			advanceConfirmBtn()
 		)
 	}
@@ -59,5 +62,8 @@ advanceScene.action(ADVANCE_ADD_ID, async ctx => {
 	await ctx.replyWithHTML(`Аванс на <i>${date}</i> в сумі ${advance} грн додано.`)
 	return ctx.scene.leave()
 })
-advanceScene.action(ADVANCE_CANCEL_ID, leave<MyContext>())
+advanceScene.action(ADVANCE_CANCEL_ID, async ctx => {
+	await ctx.answerCbQuery()
+	return await leave<MyContext>()(ctx)
+})
 advanceScene.on("message", ctx => ctx.replyWithMarkdown("Потрібно ввести суму цифрам від 100 до 99999 грн"))
