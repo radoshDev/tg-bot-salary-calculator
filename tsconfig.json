@@ -1,15 +1,17 @@
 {
 	"compilerOptions": {
-		"lib": ["ES2021", "DOM"],
+		"lib": ["ESNext", "DOM"],
 		"module": "CommonJS",
 		"rootDir": "src",
-		"outDir": "dist",
+		"outDir": "build",
 		"allowUnreachableCode": false,
 		"noFallthroughCasesInSwitch": true,
 		"noImplicitAny": true,
 		"noImplicitOverride": true,
 		"noImplicitReturns": true,
-		"strict": true
+		"strict": true,
+		"skipLibCheck": true
 	},
-	"include": ["src/**/*.*"]
+	"include": ["src/**/*.*"],
+	"exclude": ["src/**/*.test.ts"]
 }
