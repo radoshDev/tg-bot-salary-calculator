@@ -116,7 +116,7 @@ async function start(): Promise<void> {
 			await sheet.addRow(rowValue)
 
 			return ctx.replyWithHTML(
-				`Твій заробіток за <i>${date === parseDate("") ? "сьогодні" : date}</i> <b>${day_income} грн.</b>${compliment(
+				`Твій заробіток за <i>${date === parseDate("") ? "сьогодні" : date}</i> - <b>${day_income} грн.</b>${compliment(
 					Number(day_income),
 				)}`,
 			)

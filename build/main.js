@@ -98,7 +98,7 @@ async function start() {
                 comment,
             };
             await sheet.addRow(rowValue);
-            return ctx.replyWithHTML(`Твій заробіток за <i>${date === (0, parseDate_1.parseDate)("") ? "сьогодні" : date}</i> <b>${day_income} грн.</b>${(0, compliment_1.compliment)(Number(day_income))}`);
+            return ctx.replyWithHTML(`Твій заробіток за <i>${date === (0, parseDate_1.parseDate)("") ? "сьогодні" : date}</i> - <b>${day_income} грн.</b>${(0, compliment_1.compliment)(Number(day_income))}`);
         }
         catch (error_) {
             const error = error_;
