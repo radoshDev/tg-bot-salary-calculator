@@ -1,8 +1,8 @@
 import { Convertor } from "./Convertor"
 
 describe("Testing code converter", () => {
-	let code1 = "01"
-	let code5 = "05"
+	const code1 = "01"
+	const code5 = "05"
 
 	it("it return Січень", () => {
 		expect(Convertor.codeToMonth(code1)).toBe("Січень")
@@ -14,8 +14,8 @@ describe("Testing code converter", () => {
 })
 
 describe("Testing month converter", () => {
-	let code1 = "Жовтень"
-	let code5 = "Лютий"
+	const code1 = "Жовтень"
+	const code5 = "Лютий"
 
 	it("it return 10", () => {
 		expect(Convertor.monthToCode(code1)).toBe("10")

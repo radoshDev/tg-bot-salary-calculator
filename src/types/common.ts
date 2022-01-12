@@ -13,4 +13,3 @@ export type Month =
 	| "Листопад"
 	| "Грудень"
 export type Rank = "asc" | "desc"
-export type DateString = `${number}.${number}.${number}`

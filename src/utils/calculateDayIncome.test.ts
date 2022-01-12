@@ -5,9 +5,9 @@ describe("Testing calculateDayIncome.ts", () => {
 		expect(calculateDayIncome("18550")).toBe(585)
 	})
 	it("get correct number revenue", () => {
-		expect(calculateDayIncome(18500)).toBe(585)
+		expect(calculateDayIncome(18_500)).toBe(585)
 	})
 	it("get incorrect number revenue", () => {
-		expect(calculateDayIncome("bla")).toBe(NaN)
+		expect(calculateDayIncome("bla")).toBe(Number.NaN)
 	})
 })

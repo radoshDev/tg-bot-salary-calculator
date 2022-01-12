@@ -10,7 +10,7 @@ const { enter, leave } = Scenes.Stage
 
 export const salaryScene = new Scenes.BaseScene<MyContext>(SALARY_SCENE_ID)
 salaryScene.enter(async ctx => {
-	const rows = ctx.session.rows
+	const { rows } = ctx.session
 	return ctx.reply("Вибери місяць:", monthsButtons(rows))
 })
 salaryScene.leave(ctx => ctx.reply("Головне меню", mainMenuButtons()))

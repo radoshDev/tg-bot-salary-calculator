@@ -1,7 +1,7 @@
 import { GoogleSpreadsheetRow, GoogleSpreadsheetWorksheet } from "google-spreadsheet"
 import { Context, Scenes } from "telegraf"
 
-export type SheetHeaders = {
+export interface SheetHeaders {
 	date: string
 	revenue: string
 	day_income: string

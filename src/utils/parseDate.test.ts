@@ -2,10 +2,10 @@ import { LOCALES } from "../constants"
 import { parseDate } from "./parseDate"
 
 describe("Testing parseDate.ts", () => {
-	const timeStamp = new Date().getTime()
+	const timeStamp = Date.now()
 	const dayStamp = 24 * 60 * 60 * 1000
 	const currentLocalDate = new Date().toLocaleDateString(LOCALES)
-	const [currentDay, currentMonth, currentYear] = currentLocalDate.split(".")
+	const [_currentDay, currentMonth, currentYear] = currentLocalDate.split(".")
 
 	it("pass empty string", () => {
 		expect(parseDate("")).toBe(currentLocalDate)

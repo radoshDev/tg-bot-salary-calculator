@@ -1,10 +1,16 @@
 import { Markup, Scenes } from "telegraf"
 import { mainMenuButtons } from "../buttons/mainMenuButtons"
-import { ADVANCE_CANCEL_ID, ADVANCE_SCENE_ID, ADVANCE_TEXT, EXIT_BTN_TEXT, REVENUE_REG_EXP } from "../constants"
+import {
+	ADVANCE_ADD_ID,
+	ADVANCE_CANCEL_ID,
+	ADVANCE_SCENE_ID,
+	ADVANCE_TEXT,
+	EXIT_BTN_TEXT,
+	REVENUE_REG_EXP,
+} from "../constants"
 import { MyContext, SheetHeaders, SheetRow } from "../types/spreadSheetTypes"
 import { parseDate } from "../utils/parseDate"
-import { advanceConfirmBtn } from "../buttons/advanceConfirmBtn"
-import { ADVANCE_ADD_ID } from "./../constants"
+import { advanceConfirmButton } from "../buttons/advanceConfirmButton"
 import { generateDateAdvanceText } from "../utils/generateDateAdvanceText"
 
 const { enter, leave } = Scenes.Stage
@@ -17,24 +23,25 @@ advanceScene.leave(ctx => ctx.reply("Головне меню", mainMenuButtons()
 advanceScene.hears(REVENUE_REG_EXP, async ctx => {
 	if (!ctx.match.groups) throw new Error("Groups does not exist in regular expression")
 
-	const { date: userDate, revenue: advance, comment } = ctx.match.groups
+	const { date: userDate, revenue: advance, comment: userComment } = ctx.match.groups
 	const date = parseDate(userDate)
+	const comment = `${ADVANCE_TEXT}${userComment ? ` | ${userComment}` : ""}`
 	const monthYear = date.slice(3)
-	const sheet = ctx.session.sheet
+	const { sheet } = ctx.session
 	const rows = await sheet.getRows()
-	const isDBIncludeComment = (row: SheetRow):boolean => 
+	const isDBIncludeComment = (row: SheetRow): boolean =>
 		!!row.date?.includes(monthYear) && !!row.comment?.includes(ADVANCE_TEXT)
-	const currentMonthAdvance = rows.filter(isDBIncludeComment)
+	const currentMonthAdvance = rows.filter(row => isDBIncludeComment(row))
 	if (currentMonthAdvance.length > 0) {
 		ctx.session.advance = {
 			date,
 			revenue: "",
 			day_income: advance,
-			comment: `${ADVANCE_TEXT}${comment ? " | " + comment : ""}`,
+			comment,
 		}
 		return ctx.replyWithHTML(
 			`В даному місяці вже додано аванс\n${generateDateAdvanceText(currentMonthAdvance)}.\n Додати ще один?`,
-			advanceConfirmBtn()
+			advanceConfirmButton(),
 		)
 	}
 
@@ -42,7 +49,7 @@ advanceScene.hears(REVENUE_REG_EXP, async ctx => {
 		date,
 		revenue: "",
 		day_income: advance,
-		comment: `${ADVANCE_TEXT}${comment ? " | " + comment : ""}`,
+		comment,
 	} as SheetHeaders)
 
 	await ctx.replyWithHTML(`Аванс на <i>${date}</i> в сумі ${advance} грн додано.`)
@@ -50,7 +57,7 @@ advanceScene.hears(REVENUE_REG_EXP, async ctx => {
 })
 advanceScene.hears(EXIT_BTN_TEXT, leave<MyContext>())
 advanceScene.action(ADVANCE_ADD_ID, async ctx => {
-	const sheet = ctx.session.sheet
+	const { sheet } = ctx.session
 	const { date, revenue, day_income: advance, comment } = ctx.session.advance
 	await sheet.addRow({
 		date,
@@ -64,6 +71,6 @@ advanceScene.action(ADVANCE_ADD_ID, async ctx => {
 })
 advanceScene.action(ADVANCE_CANCEL_ID, async ctx => {
 	await ctx.answerCbQuery()
-	return await leave<MyContext>()(ctx)
+	return leave<MyContext>()(ctx)
 })
 advanceScene.on("message", ctx => ctx.replyWithMarkdown("Потрібно ввести суму цифрам від 100 до 99999 грн"))

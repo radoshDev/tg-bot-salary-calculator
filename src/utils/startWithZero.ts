@@ -1,6 +1,8 @@
-export function startWithZero(value: number | string): string {
-	if (typeof value === "string") value = Number(value)
-	if (isNaN(value) || value < 1) throw new Error("Not valid number: " + value)
+import { UNEXPECTED_MSG } from "../constants"
 
-	return value > 9 ? `${value}` : `0${value}`
+export function startWithZero(value: number | string): string {
+	const numerable = Number(value)
+	if (Number.isNaN(numerable) || numerable < 1) throw new Error(UNEXPECTED_MSG)
+
+	return numerable > 9 ? `${numerable}` : `0${numerable}`
 }

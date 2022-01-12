@@ -7,6 +7,9 @@
 		"airbnb-base",
 		"eslint:recommended",
 		"plugin:@typescript-eslint/recommended",
+		"plugin:import/errors",
+		"plugin:import/warnings",
+		"plugin:import/typescript",
 		"plugin:unicorn/recommended",
 		"plugin:prettier/recommended",
 		"prettier"
@@ -18,8 +21,47 @@
 	},
 	"plugins": ["@typescript-eslint", "prettier", "unicorn"],
 	"rules": {
-		"prettier/prettier": 2,
-		"@typescript-eslint/no-unused-vars": "error",
-		"@typescript-eslint/consistent-type-definitions": ["error", "type"]
+		"no-use-before-define": ["error", { "functions": false }],
+		"no-unused-vars": "off",
+		"no-shadow": "off",
+		"camelcase": ["warn", { "properties": "never", "ignoreDestructuring": true, "ignoreGlobals": true }],
+		"@typescript-eslint/no-unused-vars": ["warn", { "varsIgnorePattern": "^_" }],
+		"@typescript-eslint/no-shadow": ["error"],
+		"@typescript-eslint/consistent-type-definitions": ["error", "interface"],
+		"import/extensions": [
+			"error",
+			"ignorePackages",
+			{
+				"js": "never",
+				"jsx": "never",
+				"ts": "never",
+				"tsx": "never"
+			}
+		],
+		"import/prefer-default-export": "off",
+		"prettier/prettier": 1,
+		"unicorn/filename-case": [
+			"error",
+			{
+				"cases": {
+					"camelCase": true,
+					"pascalCase": true
+				},
+				"ignore": [".*API\\.(ts|js)", "react-app-env\\.d\\.ts", "app-env\\.d\\.ts"]
+			}
+		],
+		"unicorn/prevent-abbreviations": [
+			"error",
+			{
+				"allowList": {
+					"Props": true,
+					"videoRef": true,
+					"ProcessEnv": true,
+					"env": true,
+					"ctx": true,
+					"doc": true
+				}
+			}
+		]
 	}
 }

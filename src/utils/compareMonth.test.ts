@@ -36,10 +36,10 @@ describe("Testing startWithZero.ts", () => {
 	const sortedDesc = ["01.2023", "02.2022", "01.2022", "12.2021", "11.2021"]
 
 	it("sort array of strings by descending", () => {
-		expect([...list].sort((a, b) => compareMonth("01." + a, "01." + b, "desc"))).toEqual(sortedDesc)
+		expect([...list].sort((a, b) => compareMonth(`01.${a}`, `01.${b}`, "desc"))).toEqual(sortedDesc)
 	})
 	it("sort array of strings by ascension", () => {
-		expect([...list].sort((a, b) => compareMonth("01." + a, "01." + b, "asc"))).toEqual(sortedAsc)
+		expect([...list].sort((a, b) => compareMonth(`01.${a}`, `01.${b}`, "asc"))).toEqual(sortedAsc)
 	})
 	it("sort array of SheetRow by ascension", () => {
 		expect(mockSheetRows.sort((a, b) => compareMonth(a.date, b.date, "asc"))).toEqual(mockSortedAsc)

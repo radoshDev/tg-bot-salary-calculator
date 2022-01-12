@@ -2,16 +2,16 @@ import { Scenes } from "telegraf"
 import { monthsButtons } from "../buttons/monthsButtons"
 import { mainMenuButtons } from "../buttons/mainMenuButtons"
 import { EXIT_BTN_TEXT, MONTH_REG_EXP, REPORT_SCENE_ID } from "../constants"
-import { MyContext, SheetHeaders } from "../types/spreadSheetTypes"
+import { MyContext } from "../types/spreadSheetTypes"
 import { compareMonth } from "../utils/compareMonth"
 import { Convertor } from "../utils/Convertor"
-import { generateReportText } from "./../utils/generateReportText"
+import { generateReportText } from "../utils/generateReportText"
 
 const { enter, leave } = Scenes.Stage
 
 export const reportScene = new Scenes.BaseScene<MyContext>(REPORT_SCENE_ID)
 reportScene.enter(async ctx => {
-	const rows = ctx.session.rows
+	const { rows } = ctx.session
 	return ctx.reply("Вибери місяць:", monthsButtons(rows))
 })
 reportScene.leave(ctx => ctx.reply("Головне меню", mainMenuButtons()))
@@ -21,7 +21,7 @@ reportScene.hears(MONTH_REG_EXP, ctx => {
 	const rowsOfMonth = ctx.session.rows
 		.map(({ date, revenue, day_income, comment }) => ({ date, revenue, day_income, comment }))
 		.filter(row => row.date?.includes(numerableDateMonthYear))
-		.sort((a, b) => compareMonth(a.date!, b.date!, "asc"))
+		.sort((a, b) => compareMonth(a.date, b.date, "asc"))
 	return ctx.replyWithHTML(generateReportText(rowsOfMonth))
 })
 reportScene.hears(EXIT_BTN_TEXT, leave<MyContext>())

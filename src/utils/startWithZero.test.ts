@@ -1,3 +1,4 @@
+import { UNEXPECTED_MSG } from "../constants"
 import { startWithZero } from "./startWithZero"
 
 describe("Testing startWithZero.ts", () => {
@@ -14,12 +15,12 @@ describe("Testing startWithZero.ts", () => {
 		expect(startWithZero(25)).toBe("25")
 	})
 	it("get invalid string", () => {
-		expect(() => startWithZero("test")).toThrowError("Not valid number")
+		expect(() => startWithZero("test")).toThrowError(UNEXPECTED_MSG)
 	})
 	it("get string number less then 0", () => {
-		expect(() => startWithZero("-3")).toThrowError("Not valid number")
+		expect(() => startWithZero("-3")).toThrowError(UNEXPECTED_MSG)
 	})
 	it("get number is 0", () => {
-		expect(() => startWithZero(0)).toThrowError("Not valid number")
+		expect(() => startWithZero(0)).toThrowError(UNEXPECTED_MSG)
 	})
 })

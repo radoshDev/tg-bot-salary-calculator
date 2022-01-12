@@ -10,11 +10,11 @@ export function parseDate(date: string | undefined): string {
 
 	const currentLocaleDate = currentDate.toLocaleDateString(LOCALES)
 	const [currentDay, currentMonth, currentYear] = currentLocaleDate.split(".")
-	let [userDay, userMonth, userYear] = date.split(".")
-	userYear = userYear?.length === 2 ? `20${userYear}` : userYear
+	const [userDay, userMonth, userYear] = date.split(".")
+	const fullYear = userYear?.length === 2 ? `20${userYear}` : userYear
 	const day = startWithZero(/\d/.test(userDay) ? userDay : currentDay)
 	const month = startWithZero(userMonth || currentMonth)
-	const year = startWithZero(userYear || currentYear)
+	const year = startWithZero(fullYear || currentYear)
 	const result = `${day}.${month}.${year}`
 	if (Date.parse(result) > Date.parse(currentLocaleDate)) {
 		throw new Error(ERROR_MSG_FUTURE_DATE)
