@@ -41,9 +41,9 @@ var telegraf_1 = require("telegraf");
 var monthsButtons_1 = require("../buttons/monthsButtons");
 var mainMenuButtons_1 = require("../buttons/mainMenuButtons");
 var constants_1 = require("../constants");
-var calculateMonthSalary_1 = require("../utils/calculateMonthSalary");
 var Convertor_1 = require("../utils/Convertor");
-var _a = telegraf_1.Scenes.Stage, enter = _a.enter, leave = _a.leave;
+var generateSalaryText_1 = require("../utils/generateSalaryText");
+var leave = telegraf_1.Scenes.Stage.leave;
 exports.salaryScene = new telegraf_1.Scenes.BaseScene(constants_1.SALARY_SCENE_ID);
 exports.salaryScene.enter(function (ctx) { return __awaiter(void 0, void 0, void 0, function () {
     var rows;
@@ -57,8 +57,7 @@ exports.salaryScene.hears(constants_1.MONTH_REG_EXP, function (ctx) {
     var _a = ctx.match, _ = _a[0], month = _a[1], year = _a[2];
     var numerableDateMonthYear = Convertor_1.Convertor.monthToCode(month) + "." + year;
     var rowsOfMonth = ctx.session.rows.filter(function (row) { var _a; return (_a = row.date) === null || _a === void 0 ? void 0 : _a.includes(numerableDateMonthYear); });
-    var monthSalary = (0, calculateMonthSalary_1.calculateMonthSalary)(rowsOfMonth);
-    return ctx.replyWithHTML("\u0417\u0430\u0440\u043F\u043B\u0430\u0442\u0430 \u0437\u0430 <u><i>" + month.toLowerCase() + " " + year + "-\u0433\u043E</i></u>: <b>" + monthSalary + " \u0433\u0440\u043D</b>.");
+    return ctx.replyWithHTML((0, generateSalaryText_1.generateSalaryText)(rowsOfMonth, ctx.message.text));
 });
 exports.salaryScene.hears(constants_1.EXIT_BTN_TEXT, leave());
 exports.salaryScene.on("message", function (ctx) { return ctx.replyWithMarkdown("Треба вибрати з кнопок"); });

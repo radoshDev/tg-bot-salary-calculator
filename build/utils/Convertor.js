@@ -10,7 +10,7 @@ var Convertor = /** @class */ (function () {
     Convertor.monthToCode = function (month) {
         var _this = this;
         var monthsCodes = Object.keys(this.base);
-        return monthsCodes.find(function (code) { return _this.base[code] === month; });
+        return monthsCodes.find(function (code) { return _this.base[code] === month; }) || "Помилка дати";
     };
     Convertor.base = {
         "01": "Січень",

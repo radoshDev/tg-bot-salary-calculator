@@ -25,9 +25,10 @@
 		"no-unused-vars": "off",
 		"no-shadow": "off",
 		"camelcase": ["warn", { "properties": "never", "ignoreDestructuring": true, "ignoreGlobals": true }],
+		"@typescript-eslint/explicit-function-return-type": [2, { "allowExpressions": true }],
 		"@typescript-eslint/no-unused-vars": ["warn", { "varsIgnorePattern": "^_" }],
 		"@typescript-eslint/no-shadow": ["error"],
-		"@typescript-eslint/consistent-type-definitions": ["error", "interface"],
+		"@typescript-eslint/consistent-type-definitions": ["error", "type"],
 		"import/extensions": [
 			"error",
 			"ignorePackages",
@@ -39,6 +40,7 @@
 			}
 		],
 		"import/prefer-default-export": "off",
+		"import/no-unresolved": "off",
 		"prettier/prettier": 1,
 		"unicorn/filename-case": [
 			"error",
