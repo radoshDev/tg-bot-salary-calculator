@@ -6,6 +6,7 @@ function startWithZero(value) {
     var numerable = Number(value);
     if (Number.isNaN(numerable) || numerable < 1)
         throw new Error(constants_1.UNEXPECTED_MSG);
+    var test = "Must be pushed to git";
     return numerable > 9 ? "" + numerable : "0" + numerable;
 }
 exports.startWithZero = startWithZero;

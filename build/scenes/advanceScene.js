@@ -43,7 +43,7 @@ var constants_1 = require("../constants");
 var parseDate_1 = require("../utils/parseDate");
 var advanceConfirmButton_1 = require("../buttons/advanceConfirmButton");
 var generateDateAdvanceText_1 = require("../utils/generateDateAdvanceText");
-var _a = telegraf_1.Scenes.Stage, enter = _a.enter, leave = _a.leave;
+var leave = telegraf_1.Scenes.Stage.leave;
 exports.advanceScene = new telegraf_1.Scenes.BaseScene(constants_1.ADVANCE_SCENE_ID);
 exports.advanceScene.enter(function (ctx) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {

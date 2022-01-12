@@ -13,7 +13,7 @@ import { parseDate } from "../utils/parseDate"
 import { advanceConfirmButton } from "../buttons/advanceConfirmButton"
 import { generateDateAdvanceText } from "../utils/generateDateAdvanceText"
 
-const { enter, leave } = Scenes.Stage
+const { leave } = Scenes.Stage
 
 export const advanceScene = new Scenes.BaseScene<MyContext>(ADVANCE_SCENE_ID)
 advanceScene.enter(async ctx => {
