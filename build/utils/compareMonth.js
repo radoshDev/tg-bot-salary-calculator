@@ -1,12 +1,14 @@
 "use strict";
 exports.__esModule = true;
 exports.compareMonth = void 0;
-var convertToUSDate_1 = require("./convertToUSDate");
+var convertToUsDate_1 = require("./convertToUsDate");
 function compareMonth(datableA, datableB, rank) {
-    var aDate = Date.parse((0, convertToUSDate_1.convertToUSDate)(datableA));
-    var bDate = Date.parse((0, convertToUSDate_1.convertToUSDate)(datableB));
-    if (isNaN(aDate) || isNaN(bDate))
-        throw Error("Pass not datable value");
+    if (!datableA || !datableB)
+        return 0;
+    var aDate = Date.parse((0, convertToUsDate_1.convertToUsDate)(datableA));
+    var bDate = Date.parse((0, convertToUsDate_1.convertToUsDate)(datableB));
+    if (Number.isNaN(aDate) || Number.isNaN(bDate))
+        throw new Error("Pass not datable value");
     if (rank === "asc")
         return aDate - bDate;
     if (rank === "desc")

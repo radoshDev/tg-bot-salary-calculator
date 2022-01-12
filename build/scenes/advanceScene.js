@@ -41,8 +41,7 @@ var telegraf_1 = require("telegraf");
 var mainMenuButtons_1 = require("../buttons/mainMenuButtons");
 var constants_1 = require("../constants");
 var parseDate_1 = require("../utils/parseDate");
-var advanceConfirmBtn_1 = require("../buttons/advanceConfirmBtn");
-var constants_2 = require("./../constants");
+var advanceConfirmButton_1 = require("../buttons/advanceConfirmButton");
 var generateDateAdvanceText_1 = require("../utils/generateDateAdvanceText");
 var _a = telegraf_1.Scenes.Stage, enter = _a.enter, leave = _a.leave;
 exports.advanceScene = new telegraf_1.Scenes.BaseScene(constants_1.ADVANCE_SCENE_ID);
@@ -53,35 +52,36 @@ exports.advanceScene.enter(function (ctx) { return __awaiter(void 0, void 0, voi
 }); });
 exports.advanceScene.leave(function (ctx) { return ctx.reply("Головне меню", (0, mainMenuButtons_1.mainMenuButtons)()); });
 exports.advanceScene.hears(constants_1.REVENUE_REG_EXP, function (ctx) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, userDate, advance, comment, date, monthYear, sheet, rows, isDBIncludeComment, currentMonthAdvance;
+    var _a, userDate, advance, userComment, date, comment, monthYear, sheet, rows, isDBIncludeComment, currentMonthAdvance;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
                 if (!ctx.match.groups)
                     throw new Error("Groups does not exist in regular expression");
-                _a = ctx.match.groups, userDate = _a.date, advance = _a.revenue, comment = _a.comment;
+                _a = ctx.match.groups, userDate = _a.date, advance = _a.revenue, userComment = _a.comment;
                 date = (0, parseDate_1.parseDate)(userDate);
+                comment = "" + constants_1.ADVANCE_TEXT + (userComment ? " | " + userComment : "");
                 monthYear = date.slice(3);
                 sheet = ctx.session.sheet;
                 return [4 /*yield*/, sheet.getRows()];
             case 1:
                 rows = _b.sent();
                 isDBIncludeComment = function (row) { var _a, _b; return !!((_a = row.date) === null || _a === void 0 ? void 0 : _a.includes(monthYear)) && !!((_b = row.comment) === null || _b === void 0 ? void 0 : _b.includes(constants_1.ADVANCE_TEXT)); };
-                currentMonthAdvance = rows.filter(isDBIncludeComment);
+                currentMonthAdvance = rows.filter(function (row) { return isDBIncludeComment(row); });
                 if (currentMonthAdvance.length > 0) {
                     ctx.session.advance = {
                         date: date,
                         revenue: "",
                         day_income: advance,
-                        comment: "" + constants_1.ADVANCE_TEXT + (comment ? " | " + comment : "")
+                        comment: comment
                     };
-                    return [2 /*return*/, ctx.replyWithHTML("\u0412 \u0434\u0430\u043D\u043E\u043C\u0443 \u043C\u0456\u0441\u044F\u0446\u0456 \u0432\u0436\u0435 \u0434\u043E\u0434\u0430\u043D\u043E \u0430\u0432\u0430\u043D\u0441\n" + (0, generateDateAdvanceText_1.generateDateAdvanceText)(currentMonthAdvance) + ".\n \u0414\u043E\u0434\u0430\u0442\u0438 \u0449\u0435 \u043E\u0434\u0438\u043D?", (0, advanceConfirmBtn_1.advanceConfirmBtn)())];
+                    return [2 /*return*/, ctx.replyWithHTML("\u0412 \u0434\u0430\u043D\u043E\u043C\u0443 \u043C\u0456\u0441\u044F\u0446\u0456 \u0432\u0436\u0435 \u0434\u043E\u0434\u0430\u043D\u043E \u0430\u0432\u0430\u043D\u0441\n" + (0, generateDateAdvanceText_1.generateDateAdvanceText)(currentMonthAdvance) + ".\n \u0414\u043E\u0434\u0430\u0442\u0438 \u0449\u0435 \u043E\u0434\u0438\u043D?", (0, advanceConfirmButton_1.advanceConfirmButton)())];
                 }
                 return [4 /*yield*/, sheet.addRow({
                         date: date,
                         revenue: "",
                         day_income: advance,
-                        comment: "" + constants_1.ADVANCE_TEXT + (comment ? " | " + comment : "")
+                        comment: comment
                     })];
             case 2:
                 _b.sent();
@@ -93,7 +93,7 @@ exports.advanceScene.hears(constants_1.REVENUE_REG_EXP, function (ctx) { return 
     });
 }); });
 exports.advanceScene.hears(constants_1.EXIT_BTN_TEXT, leave());
-exports.advanceScene.action(constants_2.ADVANCE_ADD_ID, function (ctx) { return __awaiter(void 0, void 0, void 0, function () {
+exports.advanceScene.action(constants_1.ADVANCE_ADD_ID, function (ctx) { return __awaiter(void 0, void 0, void 0, function () {
     var sheet, _a, date, revenue, advance, comment;
     return __generator(this, function (_b) {
         switch (_b.label) {
@@ -124,8 +124,7 @@ exports.advanceScene.action(constants_1.ADVANCE_CANCEL_ID, function (ctx) { retu
             case 0: return [4 /*yield*/, ctx.answerCbQuery()];
             case 1:
                 _a.sent();
-                return [4 /*yield*/, leave()(ctx)];
-            case 2: return [2 /*return*/, _a.sent()];
+                return [2 /*return*/, leave()(ctx)];
         }
     });
 }); });

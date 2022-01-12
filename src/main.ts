@@ -92,13 +92,13 @@ async function start() {
 						`Відредаговано за <i>${date}</i>.\n\n Заробіток у цей день: <b>${calculateDayIncome(revenue)} грн</b>`,
 					)
 				}
-
-				await sheet.addRow({
+				const rowValue: SheetHeaders = {
 					date,
 					revenue,
 					day_income,
 					comment,
-				} as SheetHeaders)
+				}
+				await sheet.addRow(rowValue)
 
 				return ctx.replyWithMarkdown(compliment(Number(day_income)))
 			} catch (error_) {

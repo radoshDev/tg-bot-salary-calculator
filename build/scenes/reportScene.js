@@ -43,7 +43,7 @@ var mainMenuButtons_1 = require("../buttons/mainMenuButtons");
 var constants_1 = require("../constants");
 var compareMonth_1 = require("../utils/compareMonth");
 var Convertor_1 = require("../utils/Convertor");
-var generateReportText_1 = require("./../utils/generateReportText");
+var generateReportText_1 = require("../utils/generateReportText");
 var _a = telegraf_1.Scenes.Stage, enter = _a.enter, leave = _a.leave;
 exports.reportScene = new telegraf_1.Scenes.BaseScene(constants_1.REPORT_SCENE_ID);
 exports.reportScene.enter(function (ctx) { return __awaiter(void 0, void 0, void 0, function () {

@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var telegraf_1 = require("telegraf");
 var google_spreadsheet_1 = require("google-spreadsheet");
+var dotenv_1 = require("dotenv");
 var scenes_1 = require("./scenes");
 var mainMenuButtons_1 = require("./buttons/mainMenuButtons");
 var compliment_1 = require("./utils/compliment");
@@ -46,11 +47,10 @@ var parseUserText_1 = require("./utils/parseUserText");
 var constants_1 = require("./constants");
 var loaderButton_1 = require("./buttons/loaderButton");
 var calculateDayIncome_1 = require("./utils/calculateDayIncome");
-//reading ENV file
-require("dotenv").config();
+(0, dotenv_1.config)();
 var token = process.env.TG_BOT_TOKEN;
 if (!token)
-    throw Error("BOT_TOKEN must be provided!");
+    throw new Error("BOT_TOKEN must be provided!");
 var bot = new telegraf_1.Telegraf(token);
 start();
 function start() {
@@ -96,8 +96,7 @@ function start() {
                                     return [4 /*yield*/, sheet.getRows()];
                                 case 1:
                                     _a.rows = _b.sent();
-                                    return [4 /*yield*/, ctx.scene.enter(constants_1.SALARY_SCENE_ID)];
-                                case 2: return [2 /*return*/, _b.sent()];
+                                    return [2 /*return*/, ctx.scene.enter(constants_1.SALARY_SCENE_ID)];
                             }
                         });
                     }); });
@@ -110,33 +109,28 @@ function start() {
                                     title = getSheetTitle(ctx);
                                     sheet = doc_1.sheetsByTitle[title];
                                     if (!sheet)
-                                        throw Error(constants_1.ERROR_MSG_SHEET);
+                                        throw new Error(constants_1.ERROR_MSG_SHEET);
                                     _a = ctx.session;
                                     return [4 /*yield*/, sheet.getRows()];
                                 case 1:
                                     _a.rows = _b.sent();
-                                    return [4 /*yield*/, ctx.scene.enter(constants_1.REPORT_SCENE_ID)];
-                                case 2: return [2 /*return*/, _b.sent()];
+                                    return [2 /*return*/, ctx.scene.enter(constants_1.REPORT_SCENE_ID)];
                             }
                         });
                     }); });
                     bot.hears(constants_1.ADVANCE_BTN_TEXT, function (ctx) { return __awaiter(_this, void 0, void 0, function () {
                         var title, sheet;
                         return __generator(this, function (_a) {
-                            switch (_a.label) {
-                                case 0:
-                                    title = getSheetTitle(ctx);
-                                    sheet = doc_1.sheetsByTitle[title];
-                                    if (!sheet)
-                                        throw Error(constants_1.ERROR_MSG_SHEET);
-                                    ctx.session.sheet = sheet;
-                                    return [4 /*yield*/, ctx.scene.enter(constants_1.ADVANCE_SCENE_ID)];
-                                case 1: return [2 /*return*/, _a.sent()];
-                            }
+                            title = getSheetTitle(ctx);
+                            sheet = doc_1.sheetsByTitle[title];
+                            if (!sheet)
+                                throw new Error(constants_1.ERROR_MSG_SHEET);
+                            ctx.session.sheet = sheet;
+                            return [2 /*return*/, ctx.scene.enter(constants_1.ADVANCE_SCENE_ID)];
                         });
                     }); });
                     bot.hears(constants_1.REVENUE_REG_EXP, function (ctx) { return __awaiter(_this, void 0, void 0, function () {
-                        var userInput, _a, date, comment, revenue, day_income, title, sheet, rows, rowInDB, e_1, error;
+                        var userInput, _a, date, comment, revenue, day_income, title, sheet, rows, rowInDB, rowValue, error_2, error;
                         var _b;
                         return __generator(this, function (_c) {
                             switch (_c.label) {
@@ -147,7 +141,7 @@ function start() {
                                     title = getSheetTitle(ctx);
                                     sheet = doc_1.sheetsByTitle[title];
                                     if (!sheet)
-                                        throw Error(constants_1.ERROR_MSG_SHEET);
+                                        throw new Error(constants_1.ERROR_MSG_SHEET);
                                     return [4 /*yield*/, sheet.getRows()];
                                 case 1:
                                     rows = _c.sent();
@@ -160,18 +154,20 @@ function start() {
                                 case 2:
                                     _c.sent();
                                     return [2 /*return*/, ctx.replyWithHTML("\u0412\u0456\u0434\u0440\u0435\u0434\u0430\u0433\u043E\u0432\u0430\u043D\u043E \u0437\u0430 <i>" + date + "</i>.\n\n \u0417\u0430\u0440\u043E\u0431\u0456\u0442\u043E\u043A \u0443 \u0446\u0435\u0439 \u0434\u0435\u043D\u044C: <b>" + (0, calculateDayIncome_1.calculateDayIncome)(revenue) + " \u0433\u0440\u043D</b>")];
-                                case 3: return [4 /*yield*/, sheet.addRow({
+                                case 3:
+                                    rowValue = {
                                         date: date,
                                         revenue: revenue,
                                         day_income: day_income,
                                         comment: comment
-                                    })];
+                                    };
+                                    return [4 /*yield*/, sheet.addRow(rowValue)];
                                 case 4:
                                     _c.sent();
                                     return [2 /*return*/, ctx.replyWithMarkdown((0, compliment_1.compliment)(Number(day_income)))];
                                 case 5:
-                                    e_1 = _c.sent();
-                                    error = e_1;
+                                    error_2 = _c.sent();
+                                    error = error_2;
                                     return [2 /*return*/, ctx.replyWithHTML(error.message)];
                                 case 6: return [2 /*return*/];
                             }
