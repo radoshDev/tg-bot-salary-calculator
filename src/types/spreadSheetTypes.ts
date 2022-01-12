@@ -1,32 +1,19 @@
 import { GoogleSpreadsheetRow, GoogleSpreadsheetWorksheet } from "google-spreadsheet"
 import { Context, Scenes } from "telegraf"
 
-interface Headers {
-	[header: string]: string | number | boolean
-}
+type Headers = "date" | "revenue" | "day_income" | "comment"
 
-export interface SheetHeaders extends Headers {
-	date: string
-	revenue: string
-	day_income: string
-	comment: string
-}
+export type SheetHeaders<H extends string = Headers> = { [P in H]: string }
 
-export interface SheetRow extends GoogleSpreadsheetRow {
-	date?: SheetHeaders["date"]
-	revenue?: SheetHeaders["revenue"]
-	day_income?: SheetHeaders["day_income"]
-	comment?: SheetHeaders["comment"]
-}
+export type SheetRow = Partial<SheetHeaders> & GoogleSpreadsheetRow
 
-interface MySession extends Scenes.SceneSession {
-	// will be available under `ctx.session.mySessionProp`
+type MySession = {
 	rows: SheetRow[]
 	sheet: GoogleSpreadsheetWorksheet
 	advance: SheetHeaders
-}
+} & Scenes.SceneSession
 
-export interface MyContext extends Context {
+export type MyContext = {
 	session: MySession
 	scene: Scenes.SceneContextScene<MyContext>
-}
+} & Context

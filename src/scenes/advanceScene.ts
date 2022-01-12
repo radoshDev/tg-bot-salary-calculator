@@ -32,6 +32,7 @@ advanceScene.hears(REVENUE_REG_EXP, async ctx => {
 	const isDBIncludeComment = (row: SheetRow): boolean =>
 		!!row.date?.includes(monthYear) && !!row.comment?.includes(ADVANCE_TEXT)
 	const currentMonthAdvance = rows.filter(row => isDBIncludeComment(row))
+
 	if (currentMonthAdvance.length > 0) {
 		ctx.session.advance = {
 			date,

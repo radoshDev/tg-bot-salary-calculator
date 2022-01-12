@@ -1,18 +1,8 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.Convertor = void 0;
-var Convertor = /** @class */ (function () {
-    function Convertor() {
-    }
-    Convertor.codeToMonth = function (code) {
-        return this.base[code] || "Помилка дати";
-    };
-    Convertor.monthToCode = function (month) {
-        var _this = this;
-        var monthsCodes = Object.keys(this.base);
-        return monthsCodes.find(function (code) { return _this.base[code] === month; }) || "Помилка дати";
-    };
-    Convertor.base = {
+class Convertor {
+    static base = {
         "01": "Січень",
         "02": "Лютий",
         "03": "Березень",
@@ -24,8 +14,14 @@ var Convertor = /** @class */ (function () {
         "09": "Вересень",
         "10": "Жовтень",
         "11": "Листопад",
-        "12": "Грудень"
+        "12": "Грудень",
     };
-    return Convertor;
-}());
+    static codeToMonth(code) {
+        return this.base[code] || "Помилка дати";
+    }
+    static monthToCode(month) {
+        const monthsCodes = Object.keys(this.base);
+        return monthsCodes.find(code => this.base[code] === month) || "Помилка дати";
+    }
+}
 exports.Convertor = Convertor;

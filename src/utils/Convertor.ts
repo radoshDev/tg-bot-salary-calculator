@@ -14,12 +14,12 @@ export class Convertor {
 		"12": "Грудень",
 	}
 
-	static codeToMonth(code: string) {
+	static codeToMonth(code: string): string {
 		return this.base[code] || "Помилка дати"
 	}
 
-	static monthToCode(month: string) {
+	static monthToCode(month: string): string {
 		const monthsCodes = Object.keys(this.base)
-		return monthsCodes.find(code => this.base[code] === month)
+		return monthsCodes.find(code => this.base[code] === month) || "Помилка дати"
 	}
 }

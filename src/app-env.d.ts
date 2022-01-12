@@ -1,5 +1,5 @@
 declare namespace NodeJS {
-	interface ProcessEnv {
+	type ProcessEnv = {
 		NODE_ENV: "development" | "production" | "test"
 		TG_BOT_TOKEN: string
 		SPREADSHEET_EMAIL: string

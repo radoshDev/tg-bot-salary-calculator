@@ -1,4 +1,4 @@
-export function compliment(income: number) {
+export function compliment(income: number): string {
 	if (income > 600) {
 		return `Твій заробіток *${income} грн.*\n\n Ти молодець! Гарно попрацювала😘`
 	}
