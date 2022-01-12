@@ -11,6 +11,7 @@ const parseUserText_1 = require("./utils/parseUserText");
 const constants_1 = require("./constants");
 const loaderButton_1 = require("./buttons/loaderButton");
 const calculateDayIncome_1 = require("./utils/calculateDayIncome");
+const parseDate_1 = require("./utils/parseDate");
 (0, dotenv_1.config)();
 const token = process.env.TG_BOT_TOKEN;
 if (!token)
@@ -97,7 +98,7 @@ async function start() {
                 comment,
             };
             await sheet.addRow(rowValue);
-            return ctx.replyWithMarkdown((0, compliment_1.compliment)(Number(day_income)));
+            return ctx.replyWithHTML(`Твій заробіток за <i>${date === (0, parseDate_1.parseDate)("") ? "сьогодні" : date}</i> <b>${day_income} грн.</b>${(0, compliment_1.compliment)(Number(day_income))}`);
         }
         catch (error_) {
             const error = error_;

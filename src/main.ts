@@ -22,6 +22,7 @@ import {
 import { loaderButton } from "./buttons/loaderButton"
 import { calculateDayIncome } from "./utils/calculateDayIncome"
 import { MyContext, SheetHeaders, SheetRow } from "./types/spreadSheetTypes"
+import { parseDate } from "./utils/parseDate"
 
 config()
 const token = process.env.TG_BOT_TOKEN
@@ -114,7 +115,11 @@ async function start(): Promise<void> {
 			}
 			await sheet.addRow(rowValue)
 
-			return ctx.replyWithMarkdown(compliment(Number(day_income)))
+			return ctx.replyWithHTML(
+				`Твій заробіток за <i>${date === parseDate("") ? "сьогодні" : date}</i> <b>${day_income} грн.</b>${compliment(
+					Number(day_income),
+				)}`,
+			)
 		} catch (error_) {
 			const error = error_ as Error
 			return ctx.replyWithHTML(error.message)
