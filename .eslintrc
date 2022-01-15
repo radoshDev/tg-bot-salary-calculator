@@ -21,14 +21,28 @@
 	},
 	"plugins": ["@typescript-eslint", "prettier", "unicorn"],
 	"rules": {
-		"no-use-before-define": ["error", { "functions": false }],
-		"no-unused-vars": "off",
-		"no-shadow": "off",
-		"camelcase": ["warn", { "properties": "never", "ignoreDestructuring": true, "ignoreGlobals": true }],
-		"@typescript-eslint/explicit-function-return-type": [2, { "allowExpressions": true }],
-		"@typescript-eslint/no-unused-vars": ["warn", { "varsIgnorePattern": "^_" }],
-		"@typescript-eslint/no-shadow": ["error"],
 		"@typescript-eslint/consistent-type-definitions": ["error", "type"],
+		"@typescript-eslint/explicit-function-return-type": [
+			2,
+			{
+				"allowExpressions": true
+			}
+		],
+		"@typescript-eslint/no-shadow": ["error"],
+		"@typescript-eslint/no-unused-vars": [
+			"warn",
+			{
+				"varsIgnorePattern": "^_"
+			}
+		],
+		"camelcase": [
+			"warn",
+			{
+				"ignoreDestructuring": true,
+				"ignoreGlobals": true,
+				"properties": "never"
+			}
+		],
 		"import/extensions": [
 			"error",
 			"ignorePackages",
@@ -39,9 +53,18 @@
 				"tsx": "never"
 			}
 		],
-		"import/prefer-default-export": "off",
 		"import/no-unresolved": "off",
+		"import/prefer-default-export": "off",
+		"no-shadow": "off",
+		"no-unused-vars": "off",
+		"no-use-before-define": [
+			"error",
+			{
+				"functions": false
+			}
+		],
 		"prettier/prettier": 1,
+		"radix": "off",
 		"unicorn/filename-case": [
 			"error",
 			{
@@ -56,12 +79,12 @@
 			"error",
 			{
 				"allowList": {
-					"Props": true,
-					"videoRef": true,
 					"ProcessEnv": true,
-					"env": true,
+					"Props": true,
 					"ctx": true,
-					"doc": true
+					"doc": true,
+					"env": true,
+					"videoRef": true
 				}
 			}
 		]

@@ -159,7 +159,7 @@ async function generateSheet(doc: GoogleSpreadsheet, title: string): Promise<Goo
 function getSheetTitle(ctx: MyContext): string {
 	const userName = ctx.message?.from?.username
 	const firstName = ctx.message?.from?.first_name || "Unknown"
-	const userId = ctx.message?.from.id || new Date()
+	const userId = ctx.message?.from.id || Date.now()
 	const title = userName || firstName + userId
 
 	return title
