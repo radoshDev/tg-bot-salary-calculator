@@ -40,7 +40,8 @@
 			{
 				"ignoreDestructuring": true,
 				"ignoreGlobals": true,
-				"properties": "never"
+				"properties": "never",
+				"allow": ["day_income"]
 			}
 		],
 		"import/extensions": [

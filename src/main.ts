@@ -23,19 +23,30 @@ import { loaderButton } from "./buttons/loaderButton"
 import { calculateDayIncome } from "./utils/calculateDayIncome"
 import { MyContext, SheetHeaders, SheetRow } from "./types/spreadSheetTypes"
 import { parseDate } from "./utils/parseDate"
+import { isAllowUser } from "./utils/isAllowUser"
 
 config()
 const token = process.env.SB_BOT_TOKEN
-console.log(process.env)
 
 if (!token) throw new Error("BOT_TOKEN must be provided!")
 
 const bot = new Telegraf<MyContext>(token)
+
 start()
+
 async function start(): Promise<void> {
 	const doc = await initSpreadSheet()
 	bot.use(session())
 	bot.use(stage.middleware())
+	bot.use((ctx, next) => {
+		const userId = ctx.message?.from.id || 0
+		if (!isAllowUser(userId)) {
+			console.log(userId)
+			return ctx.reply("Sorry. You not allowed user")
+		}
+		return next()
+	})
+
 	bot.start(async ctx => {
 		const title = getSheetTitle(ctx)
 		const sheet = doc.sheetsByTitle[title]

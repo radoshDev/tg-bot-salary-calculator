@@ -1,3 +1,6 @@
+// eslint-disable-next-line unicorn/numeric-separators-style
+export const ALLOWED_USER_LIST: number[] = [863952181, 365704277]
+
 export enum Headers {
 	date = "date",
 	revenue = "revenue",
@@ -32,7 +35,7 @@ export const ADVANCE_CANCEL_ID = "cancel"
 export const LOAD_BTN_TEXT = "Завантажую... 🚛"
 export const EXIT_BTN_TEXT = "Вихід 🔙"
 export const REVENUE_REG_EXP =
-	/^((?<date>(вчора|позавчора|(\d{1,2}(\.\d{1,2})?(\.\d{2,4})?))+)\s+)?(?<revenue>\d{4,})(\s+(?<comment>[\d'-.a-яєії]+))?/i
+	/^((?<date>(вчора|позавчора|(\d{1,2}(\.\d{1,2})?(\.\d{2,4})?))+)\s+)?(?<revenue>\d{3,})(\s+(?<comment>[\d'-.a-яєії]+))?/i
 export const MONTH_REG_EXP = /([а-яі]{5,})\s(20\d{2})/i
 
 const ERROR_MSG_PREFIX = "Халепа...😢"
