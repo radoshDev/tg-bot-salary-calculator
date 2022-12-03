@@ -18,6 +18,7 @@ import {
 	LOAD_BTN_TEXT,
 	ERROR_MSG_SHEET,
 	ADVANCE_TEXT,
+	EXIT_BTN_TEXT,
 } from "./constants"
 import { loaderButton } from "./buttons/loaderButton"
 import { calculateDayIncome } from "./utils/calculateDayIncome"
@@ -144,6 +145,10 @@ async function start(): Promise<void> {
 			"<a href='https://docs.google.com/spreadsheets/d/1MkRAS_yyHMFRvZiKKbmyAAe1Nzc6wFopAJ9WciCvMpQ/edit#gid=0'>База даних</a>",
 		),
 	)
+	bot.hears(EXIT_BTN_TEXT, ctx => {
+		ctx.replyWithHTML(`Натисни ще раз ${EXIT_BTN_TEXT}`)
+		return ctx.scene.enter(REPORT_SCENE_ID)
+	})
 	bot.on("message", ctx => {
 		return ctx.replyWithHTML(
 			"<u>Не вірно введена виручка</u>\n<i>Приклад:</i>\n<b>23000</b>\n---або---\n<b>вчора 25700</b>\n---або---\n<b>21.01 35800</b>",

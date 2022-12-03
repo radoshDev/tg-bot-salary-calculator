@@ -11,11 +11,16 @@ import { generateSalaryText } from "../utils/generateSalaryText"
 const { leave } = Scenes.Stage
 
 export const reportScene = new Scenes.BaseScene<MyContext>(REPORT_SCENE_ID)
+
+reportScene.leave(ctx => ctx.reply("Головне меню", mainMenuButtons()))
+
 reportScene.enter(async ctx => {
 	const { rows } = ctx.session
+
+	if (!rows) return false
+
 	return ctx.reply("Вибери місяць:", monthsButtons(rows, MAX_MONTHS))
 })
-reportScene.leave(ctx => ctx.reply("Головне меню", mainMenuButtons()))
 
 reportScene.hears(MONTH_REG_EXP, ctx => {
 	const [_, month, year] = ctx.match
