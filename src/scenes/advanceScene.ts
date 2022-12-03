@@ -21,40 +21,45 @@ advanceScene.enter(async ctx => {
 })
 advanceScene.leave(ctx => ctx.reply("Головне меню", mainMenuButtons()))
 advanceScene.hears(REVENUE_REG_EXP, async ctx => {
-	if (!ctx.match.groups) throw new Error("Groups does not exist in regular expression")
+	try {
+		if (!ctx.match.groups) throw new Error("Щось пішло не так. Спробуй по іншому записати дату")
 
-	const { date: userDate, revenue: advance, comment: userComment } = ctx.match.groups
-	const date = parseDate(userDate)
-	const comment = `${ADVANCE_TEXT}${userComment ? ` | ${userComment}` : ""}`
-	const monthYear = date.slice(3)
-	const { sheet } = ctx.session
-	const rows = await sheet.getRows()
-	const isDBIncludeComment = (row: SheetRow): boolean =>
-		!!row.date?.includes(monthYear) && !!row.comment?.includes(ADVANCE_TEXT)
-	const currentMonthAdvance = rows.filter(row => isDBIncludeComment(row))
+		const { date: userDate, revenue: advance, comment: userComment } = ctx.match.groups
+		const date = parseDate(userDate)
+		const comment = `${ADVANCE_TEXT}${userComment ? ` | ${userComment}` : ""}`
+		const monthYear = date.slice(3)
+		const { sheet } = ctx.session
+		const rows = await sheet.getRows()
+		const isDBIncludeComment = (row: SheetRow): boolean =>
+			!!row.date?.includes(monthYear) && !!row.comment?.includes(ADVANCE_TEXT)
+		const currentMonthAdvance = rows.filter(row => isDBIncludeComment(row))
 
-	if (currentMonthAdvance.length > 0) {
-		ctx.session.advance = {
+		if (currentMonthAdvance.length > 0) {
+			ctx.session.advance = {
+				date,
+				revenue: "",
+				day_income: advance,
+				comment,
+			}
+			return ctx.replyWithHTML(
+				`В даному місяці вже додано аванс\n${generateDateAdvanceText(currentMonthAdvance)}.\n Додати ще один?`,
+				advanceConfirmButton(),
+			)
+		}
+
+		await sheet.addRow({
 			date,
 			revenue: "",
 			day_income: advance,
 			comment,
-		}
-		return ctx.replyWithHTML(
-			`В даному місяці вже додано аванс\n${generateDateAdvanceText(currentMonthAdvance)}.\n Додати ще один?`,
-			advanceConfirmButton(),
-		)
+		} as SheetHeaders)
+
+		await ctx.replyWithHTML(`Аванс на <i>${date}</i> в сумі ${advance} грн додано.`)
+		return ctx.scene.leave()
+	} catch (_error) {
+		const error = _error as Error
+		return ctx.reply(error.message)
 	}
-
-	await sheet.addRow({
-		date,
-		revenue: "",
-		day_income: advance,
-		comment,
-	} as SheetHeaders)
-
-	await ctx.replyWithHTML(`Аванс на <i>${date}</i> в сумі ${advance} грн додано.`)
-	return ctx.scene.leave()
 })
 advanceScene.hears(EXIT_BTN_TEXT, leave<MyContext>())
 advanceScene.action(ADVANCE_ADD_ID, async ctx => {

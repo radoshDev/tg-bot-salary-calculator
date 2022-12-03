@@ -18,24 +18,36 @@ import {
 	LOAD_BTN_TEXT,
 	ERROR_MSG_SHEET,
 	ADVANCE_TEXT,
+	EXIT_BTN_TEXT,
 } from "./constants"
 import { loaderButton } from "./buttons/loaderButton"
 import { calculateDayIncome } from "./utils/calculateDayIncome"
 import { MyContext, SheetHeaders, SheetRow } from "./types/spreadSheetTypes"
 import { parseDate } from "./utils/parseDate"
+import { isAllowUser } from "./utils/isAllowUser"
 
 config()
 const token = process.env.SB_BOT_TOKEN
-console.log(process.env)
 
 if (!token) throw new Error("BOT_TOKEN must be provided!")
 
 const bot = new Telegraf<MyContext>(token)
+
 start()
+
 async function start(): Promise<void> {
 	const doc = await initSpreadSheet()
 	bot.use(session())
 	bot.use(stage.middleware())
+	bot.use((ctx, next) => {
+		const userId = ctx.message?.from.id
+		if (userId && !isAllowUser(userId)) {
+			console.log(userId)
+			return ctx.reply("Sorry. You not allowed user")
+		}
+		return next()
+	})
+
 	bot.start(async ctx => {
 		const title = getSheetTitle(ctx)
 		const sheet = doc.sheetsByTitle[title]
@@ -133,6 +145,10 @@ async function start(): Promise<void> {
 			"<a href='https://docs.google.com/spreadsheets/d/1MkRAS_yyHMFRvZiKKbmyAAe1Nzc6wFopAJ9WciCvMpQ/edit#gid=0'>База даних</a>",
 		),
 	)
+	bot.hears(EXIT_BTN_TEXT, ctx => {
+		ctx.replyWithHTML(`Натисни ще раз ${EXIT_BTN_TEXT}`)
+		return ctx.scene.enter(REPORT_SCENE_ID)
+	})
 	bot.on("message", ctx => {
 		return ctx.replyWithHTML(
 			"<u>Не вірно введена виручка</u>\n<i>Приклад:</i>\n<b>23000</b>\n---або---\n<b>вчора 25700</b>\n---або---\n<b>21.01 35800</b>",
