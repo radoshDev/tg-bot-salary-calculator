@@ -25,7 +25,9 @@ import { MyContext, SheetHeaders, SheetRow } from "./types/spreadSheetTypes"
 import { parseDate } from "./utils/parseDate"
 
 config()
-const token = process.env.TG_BOT_TOKEN
+const token = process.env.SB_BOT_TOKEN
+console.log(process.env)
+
 if (!token) throw new Error("BOT_TOKEN must be provided!")
 
 const bot = new Telegraf<MyContext>(token)
@@ -137,11 +139,13 @@ async function start(): Promise<void> {
 		)
 	})
 	bot.launch()
+	console.log("Bot is running!")
 }
 async function initSpreadSheet(): Promise<GoogleSpreadsheet> {
-	const doc = new GoogleSpreadsheet(process.env.SPREADSHEET_ID as string)
-	const clientEmail = process.env.SPREADSHEET_EMAIL
-	const privateKey = process.env.SPREADSHEET_PRIVATE_KEY?.replace(/\\n/g, "\n")
+	if (!process.env.SB_SPREADSHEET_ID) throw new Error("Spreadsheet ID not passed!")
+	const doc = new GoogleSpreadsheet(process.env.SB_SPREADSHEET_ID)
+	const clientEmail = process.env.SB_SPREADSHEET_EMAIL
+	const privateKey = process.env.SB_SPREADSHEET_PRIVATE_KEY?.replace(/\\n/g, "\n")
 	if (!clientEmail) throw new Error("SPREADSHEET_EMAIL must be provided!")
 	if (!privateKey) throw new Error("SPREADSHEET_PRIVATE_KEY must be provided!")
 
