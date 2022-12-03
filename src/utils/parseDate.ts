@@ -1,3 +1,4 @@
+import { parse, isFuture } from "date-fns"
 import { ERROR_MSG_FUTURE_DATE, LOCALES } from "../constants"
 import { startWithZero } from "./startWithZero"
 
@@ -16,7 +17,9 @@ export function parseDate(date: string | undefined): string {
 	const month = startWithZero(userMonth || currentMonth)
 	const year = startWithZero(fullYear || currentYear)
 	const result = `${day}.${month}.${year}`
-	if (Date.parse(result) > Date.parse(currentLocaleDate)) {
+	const resultDate = parse(result, "dd.MM.yyyy", new Date())
+
+	if (isFuture(resultDate)) {
 		throw new Error(ERROR_MSG_FUTURE_DATE)
 	}
 	return result

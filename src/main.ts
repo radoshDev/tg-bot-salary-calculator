@@ -39,8 +39,8 @@ async function start(): Promise<void> {
 	bot.use(session())
 	bot.use(stage.middleware())
 	bot.use((ctx, next) => {
-		const userId = ctx.message?.from.id || 0
-		if (!isAllowUser(userId)) {
+		const userId = ctx.message?.from.id
+		if (userId && !isAllowUser(userId)) {
 			console.log(userId)
 			return ctx.reply("Sorry. You not allowed user")
 		}
