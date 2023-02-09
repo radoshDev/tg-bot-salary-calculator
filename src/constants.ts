@@ -22,7 +22,7 @@ export const monthsByCode = {
 	"12": "Грудень",
 }
 export const LOCALES = "uk-UA"
-export const FIXED_SALARY = 400
+export const FIXED_SALARY = 450
 export const MAX_MONTHS = 4
 
 export const REPORT_SCENE_ID = "report"
