@@ -9,6 +9,7 @@
 		"esModuleInterop": true,
 		"skipLibCheck": true,
 		"isolatedModules": true
+
 	},
 	"include": ["src/**/*.*"],
 	"exclude": ["src/**/*.test.ts"]
