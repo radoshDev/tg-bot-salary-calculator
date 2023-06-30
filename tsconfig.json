@@ -13,10 +13,7 @@
 		"strict": true,
 		"skipLibCheck": true,
 		"moduleResolution": "node",
-		"baseUrl": ".",
-		"paths": {
-			"@/*": ["src/*"]
-		}
+		"baseUrl": "."
 	},
 	"include": ["src/**/*.*"],
 	"exclude": ["src/**/*.test.ts"]
