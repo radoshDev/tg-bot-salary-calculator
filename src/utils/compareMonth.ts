@@ -1,5 +1,6 @@
+/* eslint-disable import/extensions */
 import { Rank } from "../types/common"
-import { convertToUsDate } from "./convertToUsDate"
+import { convertToUsDate } from "@/utils/convertToUsDate"
 
 export function compareMonth(datableA: string | undefined, datableB: string | undefined, rank: Rank): number {
 	if (!datableA || !datableB) return 0
