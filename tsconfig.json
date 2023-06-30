@@ -1,22 +1,16 @@
 {
 	"compilerOptions": {
-		"target": "ESNext",
-		"lib": ["ESNext", "DOM"],
+		"target": "ES5",
 		"module": "CommonJS",
-		"rootDir": "src",
+		"lib": ["ES6"],
+		"allowJs": true,
 		"outDir": "build",
-		"allowUnreachableCode": false,
-		"noFallthroughCasesInSwitch": true,
-		"noImplicitAny": true,
-		"noImplicitOverride": true,
-		"noImplicitReturns": true,
+		"rootDir": "src",
 		"strict": true,
-		"skipLibCheck": true,
-		"moduleResolution": "node",
-		"baseUrl": ".",
-		"paths": {
-			"@/*": ["src/*"]
-		}
+		"noImplicitAny": true,
+		"esModuleInterop": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true
 	},
 	"include": ["src/**/*.*"],
 	"exclude": ["src/**/*.test.ts"]
