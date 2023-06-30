@@ -1,6 +1,8 @@
 # dependencies
 /node_modules
 build
+/dist
+/.parcel-cache
 /.pnp
 .pnp.js
 
@@ -16,5 +18,4 @@ build
 .env
 
 # IDE
-/.vscode
 /.idea
