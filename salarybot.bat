@@ -1,1 +1,0 @@
-node D:\Front-end\projects\telegram-bots\salary-calculator\build\main.js
